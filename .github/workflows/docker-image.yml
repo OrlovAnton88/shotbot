@@ -2,7 +2,7 @@ name: Create Image and Deploy
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
     workflow_dispatch:
 
 env:
