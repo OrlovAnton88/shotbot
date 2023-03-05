@@ -90,12 +90,14 @@ class Bot(
     }
 
     fun joinGame(message: Message): String {
+        if (!Game.isStarted()) return "Игра еще не начата :-р"
         val user = message.from
         Game.join(message.chatId, user.id, user.firstName)
         return "Вы присоединились"
     }
 
     fun createGame(message: Message): String {
+        if (Game.isStarted()) return "Игра уже начата :-р"
         if (!isMasterMessage(message)) return "Неа..."
         Game.start(message.chatId, message.from.id, message.from.firstName)
         return "Игра создана"
@@ -113,13 +115,21 @@ class Bot(
         Game.createNextPairAndTask()
         val nextPair = Game.currentPair
 
-        return """
-            Следующими играют: 
-            *${nextPair.first().name}
-            *${nextPair.last().name}
-        """.trimIndent()
 
-        //todo: send to nex players
+
+        Game.players
+            .filter { it.chatId != message.chatId }
+            .forEach {
+            sendNotification(
+                it.chatId, """
+                Следующими играют: ${nextPair.first().name} & ${nextPair.last().name}
+            """.trimIndent()
+            )
+        }
+
+        return """
+                Следующими играют: ${nextPair.first().name} & ${nextPair.last().name}
+            """.trimIndent()
     }
 
     fun startNextRound(message: Message): String {
