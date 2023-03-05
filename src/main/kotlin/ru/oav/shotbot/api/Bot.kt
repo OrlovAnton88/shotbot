@@ -7,14 +7,14 @@ import org.telegram.telegrambots.meta.TelegramBotsApi
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 import ru.oav.shotbot.config.BotProperty
+import ru.oav.shotbot.config.GameWebSocketHandler
 import ru.oav.shotbot.model.GameEvent
-import ru.oav.shotbot.service.WebSocketEventSender
 
 @Component
 class Bot(
     val botProperty: BotProperty,
     val telegramBotsApi: TelegramBotsApi,
-    val webSocketEventSender: WebSocketEventSender,
+    val gameWebSocketHandler: GameWebSocketHandler,
 ) : TelegramLongPollingBot() {
 
     @PostConstruct
@@ -36,12 +36,12 @@ class Bot(
                 when (messageText) {
                     "/start" -> "Вилли этому господину!"
                     "/fill_left" -> {
-                        webSocketEventSender.send(GameEvent.FILL_LEFT)
+                        gameWebSocketHandler.send(GameEvent.FILL_LEFT)
                         "Наливаем слева"
                     }
 
                     "/fill_right" -> {
-                        webSocketEventSender.send(GameEvent.FILL_RIGHT)
+                        gameWebSocketHandler.send(GameEvent.FILL_RIGHT)
                         "Наливаем справа"
                     }
 
