@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-alpine as build
+FROM bellsoft/liberica-openjdk-alpine-musl:17 as build
 WORKDIR /workspace/app
 
 COPY gradle gradle
@@ -9,10 +9,10 @@ RUN apk update && apk add dos2unix
 RUN dos2unix gradlew
 RUN chmod +x gradlew
 
-RUN ./gradlew build -x test -x detekt
+RUN ./gradlew build
 RUN mkdir -p build/libs/dependency && (cd build/libs/dependency; jar -xf ../*.jar)
 
-FROM openjdk:17-jdk-alpine
+FROM bellsoft/liberica-openjre-alpine-musl:17
 VOLUME /tmp
 ARG DEPENDENCY=/workspace/app/build/libs/dependency
 COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
