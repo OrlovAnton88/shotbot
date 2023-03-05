@@ -1,6 +1,7 @@
 bot:
   username: "@AlkoMathBot"
   token: "6124541508:AAGa4nBLn9YvunN9tDdj4dBC4XS72m_6j2E"
+  masterId: 212354346
 
 
 logging:

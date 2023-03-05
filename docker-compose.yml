@@ -8,5 +8,5 @@ services:
     mem_limit: 256m
     mem_reservation: 128m
     ports:
-      - 8080:9090
+      - 9090:8080
     restart: always

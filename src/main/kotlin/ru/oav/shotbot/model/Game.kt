@@ -8,6 +8,8 @@ object Game {
     val players: MutableList<Player> = mutableListOf()
     var creator: Long? = null
     var startedAt: Instant? = null
+    val currentPair: MutableList<Player> = mutableListOf()
+    var currentTask: Task? = null
 
 
     fun start(chatId: Long, userId: Long, name: String) {
@@ -35,5 +37,14 @@ object Game {
         players.clear()
         creator = null
         startedAt = null
+    }
+
+    fun isStarted(): Boolean = startedAt != null
+
+    fun createNextPairAndTask() {
+        currentPair.clear()
+        val nextPair = players.shuffled().take(2)
+        currentPair.addAll(nextPair)
+        currentTask = Task.generateTask()
     }
 }
