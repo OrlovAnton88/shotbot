@@ -43,7 +43,8 @@ object Game {
 
     fun createNextPairAndTask() {
         currentPair.clear()
-        val nextPair = players.shuffled().take(2)
+        val nextPair = players.sortedBy { it.moves }.take(2)
+        nextPair.map { it.moves = it.moves + 1 }
         currentPair.addAll(nextPair)
         currentTask = Task.generateTask()
     }

@@ -41,15 +41,19 @@ class Bot(
                         sendNotification(chatId, "Раунд еще не начался")
                         return
                     }
-
                     if (currentTask.answered) {
                         sendNotification(chatId, "Правильно, но тебя опередили!")
                         return
                     } else if (currentTask.answer.toString() == message.text.trim()) {
+                        val isRed = Game.currentPair.first().userId == message.from.id
+                        var icon = RED_CIRCLE_TG
+                        if(!isRed){
+                            icon = GREEN_APPLE_TG
+                        }
                         currentTask.answered = true
                         sendNotification(chatId, "Правильно")
                         Game.players.forEach {
-                            sendNotification(it.chatId, " Выйграл(а) ${message.from.firstName}")
+                            sendNotification(it.chatId, " Выйграл(а) ${message.from.firstName} $icon")
                         }
                         return
                     } else {
@@ -113,7 +117,7 @@ class Bot(
         if (Game.isStarted()) return "Игра уже начата :-р"
         if (!isMasterMessage(message)) return "Неа..."
         Game.start(message.chatId, message.from.id, message.from.firstName)
-        return "Игра создана $RED_CIRCLE_TG $GREEN_APPLE_TG"
+        return "Игра создана"
     }
 
     fun finishGame(message: Message): String {
@@ -135,7 +139,7 @@ class Bot(
             .forEach {
                 sendNotification(
                     it.chatId, """
-                Следующими играют: ${nextPair.first().name} & ${nextPair.last().name}
+                Следующими играют: ${nextPair.first().name} $RED_CIRCLE_TG & ${nextPair.last().name} $GREEN_APPLE_TG
             """.trimIndent()
                 )
             }
@@ -161,7 +165,7 @@ class Bot(
     }
 
     companion object{
-        private final const val RED_CIRCLE_TG = "\uD83D\uDD34"
-        private final const val GREEN_APPLE_TG = "\uD83C\uDF4F"
+        private const val RED_CIRCLE_TG = "\uD83D\uDD34"
+        private const val GREEN_APPLE_TG = "\uD83C\uDF4F"
     }
 }
