@@ -71,7 +71,7 @@ class Bot(
 //                    BotCommands.START.value -> "Вилли этому господину!"
                     BotCommands.START.value -> {
                         gameWebSocketHandler.send(GameEvent.PREPARE)
-                        "Привет, ${message.from.firstName}!"
+                        "Привет, ${message.from.firstName}! Напиши /join"
                     }
                     BotCommands.JOIN.value -> joinGame(message)
                     BotCommands.CREATE.value -> createGame(message)
