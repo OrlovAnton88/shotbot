@@ -55,6 +55,11 @@ class Bot(
                         Game.players.forEach {
                             sendNotification(it.chatId, " Выйграл(а) ${message.from.firstName} $icon")
                         }
+                        if(isRed){
+                            gameWebSocketHandler.send(GameEvent.FILL_RIGHT)
+                        }else{
+                            gameWebSocketHandler.send(GameEvent.FILL_LEFT)
+                        }
                         return
                     } else {
                         sendNotification(chatId, "А вот и нет")
