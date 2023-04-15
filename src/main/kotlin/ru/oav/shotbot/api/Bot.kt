@@ -36,10 +36,20 @@ class Bot(
             val responseText = if (message.hasText()) {
                 val messageText = message.text
                 if (isTaskAnswer(message) && !isBotCommand(messageText)) {
-                    if (Game.currentTask?.answer.toString() == message.text.trim()) {
+                    val currentTask = Game.currentTask
+                    if (currentTask == null) {
+                        sendNotification(chatId, "Раунд еще не начался")
+                        return
+                    }
+
+                    if (currentTask.answered) {
+                        sendNotification(chatId, "Правильно, но тебя опередили!")
+                        return
+                    } else if (currentTask.answer.toString() == message.text.trim()) {
+                        currentTask.answered = true
                         sendNotification(chatId, "Правильно")
                         Game.players.forEach {
-                            sendNotification(it.chatId, " Выйграло ${message.from.firstName}")
+                            sendNotification(it.chatId, " Выйграл(а) ${message.from.firstName}")
                         }
                         return
                     } else {
@@ -49,19 +59,22 @@ class Bot(
                 }
 
                 when (messageText) {
-//                    "/start" -> "Вилли этому господину!"
-                    BotCommands.START.value -> "Привет, ${message.from.firstName}!"
+//                    BotCommands.START.value -> "Вилли этому господину!"
+                    BotCommands.START.value -> {
+                        gameWebSocketHandler.send(GameEvent.PREPARE)
+                        "Привет, ${message.from.firstName}!"
+                    }
                     BotCommands.JOIN.value -> joinGame(message)
                     BotCommands.CREATE.value -> createGame(message)
                     BotCommands.DROP.value -> finishGame(message)
                     BotCommands.PREPARE_NEXT_ROUND.value -> prepareNextRound(message)
                     BotCommands.START_NEXT_ROUND.value -> startNextRound(message)
-                    "/fill_left" -> {
+                    BotCommands.FILL_LEFT.value -> {
                         gameWebSocketHandler.send(GameEvent.FILL_LEFT)
                         "Наливаем слева"
                     }
 
-                    "/fill_right" -> {
+                    BotCommands.FILL_RIGHT.value -> {
                         gameWebSocketHandler.send(GameEvent.FILL_RIGHT)
                         "Наливаем справа"
                     }
@@ -100,7 +113,7 @@ class Bot(
         if (Game.isStarted()) return "Игра уже начата :-р"
         if (!isMasterMessage(message)) return "Неа..."
         Game.start(message.chatId, message.from.id, message.from.firstName)
-        return "Игра создана"
+        return "Игра создана $RED_CIRCLE_TG $GREEN_APPLE_TG"
     }
 
     fun finishGame(message: Message): String {
@@ -111,7 +124,7 @@ class Bot(
 
     fun prepareNextRound(message: Message): String {
         if (!isMasterMessage(message)) return "Неа..."
-        if (!Game.isStarted()) return "Игра не начата"
+        if (!Game.isStarted()) return "Игра еще не началась"
         Game.createNextPairAndTask()
         val nextPair = Game.currentPair
 
@@ -120,12 +133,12 @@ class Bot(
         Game.players
             .filter { it.chatId != message.chatId }
             .forEach {
-            sendNotification(
-                it.chatId, """
+                sendNotification(
+                    it.chatId, """
                 Следующими играют: ${nextPair.first().name} & ${nextPair.last().name}
             """.trimIndent()
-            )
-        }
+                )
+            }
 
         return """
                 Следующими играют: ${nextPair.first().name} & ${nextPair.last().name}
@@ -145,5 +158,10 @@ class Bot(
 
     private fun isMasterMessage(message: Message): Boolean {
         return botProperty.masterId == message.from.id
+    }
+
+    companion object{
+        private final const val RED_CIRCLE_TG = "\uD83D\uDD34"
+        private final const val GREEN_APPLE_TG = "\uD83C\uDF4F"
     }
 }

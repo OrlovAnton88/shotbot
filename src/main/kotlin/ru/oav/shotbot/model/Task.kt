@@ -2,7 +2,7 @@ package ru.oav.shotbot.model
 
 import java.util.concurrent.ThreadLocalRandom
 
-data class Task(val task: String, val answer: Int){
+data class Task(val task: String, val answer: Int, var answered: Boolean = false){
 
     companion object{
         fun generateTask(): Task{

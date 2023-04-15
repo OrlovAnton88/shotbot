@@ -6,7 +6,9 @@ enum class BotCommands(val value: String) {
     CREATE("/create"),
     DROP("/drop"),
     PREPARE_NEXT_ROUND("/prepareNextRound"),
-    START_NEXT_ROUND("/startNextRound")
+    START_NEXT_ROUND("/startNextRound"),
+    FILL_LEFT("/fill_left"),
+    FILL_RIGHT("/fill_right")
 
 
 }
